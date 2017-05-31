@@ -1,0 +1,9 @@
+[package]
+name = "robot"
+version = "0.1.0"
+authors = ["Hunter Laux <hunterlaux@gmail.com>"]
+description = "Functional reactive robot"
+license = "BSD-3-Clause"
+
+[dependencies]
+carboxyl = "0.2.1"
