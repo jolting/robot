@@ -17,28 +17,27 @@ struct Point
 }
 
 type Obstacles = Vec<Point>;
-type TpObstacles = Vec<Point>;
+type TpObstacles = Vec<Option<(f64,i32)>>;
 
 type Score  = f64;
 type Angle  = f64;
 type Kvalue = i32;
 
 fn main() {
-    let obstacles_sink   = carboxyl::Sink::new();
-    let obstacles   = obstacles_sink.stream().hold(None);
-    let command     = obstacles.map(reactiveNav);
+//    let obstacles_sink   = carboxyl::Sink::new();
+//    let obstacles   = obstacles_sink.stream().hold(None);
+//    let command     = obstacles.map(reactiveNav);
 
     //obstacles_sink.send(Some(3.0));
     //command.sample();
 }
-fn reactiveNav (obstacles : Option<Obstacles>) -> Option<HoloCommand>
-
+fn reactive_nav (obstacles : Option<Obstacles>, target : Point) -> Option<Kvalue>
 {
     match obstacles
     {
        Some(obs) => {
            let tp_obstacles = ws_to_tp(obs);
-           Some(HoloCommand { vx: 0.0, vy: 0.0, w: 0.0})
+           best_path(evaluate_paths(tp_obstacles, target))
        },
        None => None,
     }
@@ -49,8 +48,9 @@ const W_MAX: f64 = 10.0;
 const K: f64 = 0.0;
 const TURNING_RADIUS_REFERENCE: f64 = 0.001;
 const REF_DISTANCE : f64=6.0;
+const NUM_TRAJECTORIES : f64=100.0;
 
-fn ws_to_tp(obstacles : Obstacles) -> Vec<Option<(f64,i32)>>
+fn ws_to_tp(obstacles : Obstacles) -> TpObstacles
 {
     let  Rmin = (V_MAX/W_MAX).abs();
 
@@ -124,7 +124,8 @@ fn ws_to_tp(obstacles : Obstacles) -> Vec<Option<(f64,i32)>>
 
 fn alpha2index(a : Angle) -> i32
 {
-    0
+    let idx = a / 2.0 * PI;
+    idx as i32
 }
 
 fn wrapTo2Pi(a : Angle) -> Angle
@@ -143,7 +144,12 @@ fn wrapTo2Pi(a : Angle) -> Angle
     }
 }
 
-fn evaluatePaths(obstacles: TpObstacles) -> Vec<(Score, Kvalue)>
+fn evaluate_paths(obstacles: TpObstacles, target: Point) -> Vec<(Score, Kvalue)>
 {
     vec![(0.0, 0)]
+}
+
+fn best_path(paths : Vec<(Score,Kvalue)>) -> Option<Kvalue>
+{
+    Some(0)
 }
